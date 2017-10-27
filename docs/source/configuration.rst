@@ -31,3 +31,17 @@ Will result in a session that:
 - Will be accessible by Javascript.
 - Will be named "cookie" on the client.
 - will be named "sessionprefix:<sid>" in the session store.
+
+
+Using a custom serializer
+===================================
+
+sanic_session is using *usjon* as the default serializer for data stored in session.
+To use something else set the *serializer* property:
+
+.. code-block:: python
+    
+    session_interface = InMemorySessionInterface()
+    session_interface.serializer = pickle
+
+Custom serializer needs to implement *dumps* and *loads* methods. 

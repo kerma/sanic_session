@@ -1,4 +1,3 @@
-import ujson
 from sanic_session.base import BaseSessionInterface, SessionDict
 import uuid
 
@@ -6,6 +5,7 @@ from typing import Callable
 
 
 class RedisSessionInterface(BaseSessionInterface):
+
     def __init__(
             self, redis_getter: Callable,
             domain: str=None, expiry: int = 2592000,
@@ -61,7 +61,7 @@ class RedisSessionInterface(BaseSessionInterface):
             val = await redis_connection.get(self.prefix + sid)
 
             if val is not None:
-                data = ujson.loads(val)
+                data = self.serializer.loads(val)
                 session_dict = SessionDict(data, sid=sid)
             else:
                 session_dict = SessionDict(sid=sid)
@@ -95,7 +95,7 @@ class RedisSessionInterface(BaseSessionInterface):
 
             return
 
-        val = ujson.dumps(dict(request['session']))
+        val = self.serializer.dumps(dict(request['session']))
 
         await redis_connection.setex(key, self.expiry, val)
 

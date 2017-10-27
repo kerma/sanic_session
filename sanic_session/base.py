@@ -1,9 +1,11 @@
 import time
+import ujson
 
 from sanic_session.utils import CallbackDict
 
 
 class SessionDict(CallbackDict):
+
     def __init__(self, initial=None, sid=None):
         def on_update(self):
             self.modified = True
@@ -20,6 +22,7 @@ def _calculate_expires(expiry):
 
 
 class BaseSessionInterface:
+
     def _delete_cookie(self, request, response):
         response.cookies[self.cookie_name] = request['session'].sid
         response.cookies[self.cookie_name]['expires'] = 0
@@ -33,3 +36,13 @@ class BaseSessionInterface:
 
         if self.domain:
             response.cookies[self.cookie_name]['domain'] = self.domain
+
+    @property
+    def serializer(self):
+        if not hasattr(self, '_serializer'):
+            self._serializer = ujson
+        return self._serializer
+
+    @serializer.setter
+    def serializer(self, value):
+        self._serializer = value
